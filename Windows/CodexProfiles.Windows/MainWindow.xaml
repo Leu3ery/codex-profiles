@@ -10,7 +10,7 @@
   <Grid Margin="0,0,0,24">
    <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
    <StackPanel>
-    <TextBlock Text="Codex Profiles" FontSize="28" FontWeight="SemiBold" />
+    <TextBlock x:Name="TitleLabel" Text="Codex Profiles" FontSize="28" FontWeight="SemiBold" Foreground="{DynamicResource ForegroundBrush}" />
     <TextBlock x:Name="CurrentLabel" Margin="0,8,0,0" Foreground="{DynamicResource SecondaryBrush}" TextWrapping="Wrap" />
    </StackPanel>
    <Button Grid.Column="1" Content="Settings" Click="OpenSettings" VerticalAlignment="Top" Margin="16,0,0,0" />
@@ -52,19 +52,19 @@
        <TextBlock Text="{Binding Avatar}" FontFamily="Segoe UI Symbol" FontSize="20" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" />
       </Border>
       <StackPanel Grid.Column="1">
-       <TextBlock Text="{Binding Title}" FontSize="16" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+       <TextBlock Text="{Binding Title}" FontSize="16" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" Foreground="{DynamicResource ForegroundBrush}" />
        <TextBlock Text="{Binding Subtitle}" Margin="0,4,0,0" Foreground="{DynamicResource SecondaryBrush}" TextTrimming="CharacterEllipsis" />
        <TextBlock Text="{Binding Warning}" Margin="0,4,0,0" FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource SecondaryBrush}" />
        <ItemsControl ItemsSource="{Binding Windows}" Margin="0,4,12,0">
         <ItemsControl.ItemTemplate><DataTemplate>
          <Grid Margin="0,6,0,0">
           <Grid.ColumnDefinitions><ColumnDefinition Width="76" /><ColumnDefinition Width="*" /><ColumnDefinition Width="150" /></Grid.ColumnDefinitions>
-          <TextBlock Text="{Binding DurationLabel}" FontSize="12" />
+          <TextBlock Text="{Binding DurationLabel}" FontSize="12" Foreground="{DynamicResource ForegroundBrush}" />
           <StackPanel Grid.Column="1">
            <ProgressBar Value="{Binding RemainingPercent, Mode=OneWay}" Maximum="100" Height="5" Foreground="{DynamicResource AccentBrush}" Background="{DynamicResource BorderBrush}" BorderThickness="0" />
            <TextBlock Text="{Binding ResetLabel}" Margin="0,4,0,0" FontSize="11" Foreground="{DynamicResource SecondaryBrush}" />
           </StackPanel>
-          <TextBlock Grid.Column="2" Text="{Binding RemainingPercent, StringFormat={}{0:0}% remaining}" FontSize="12" HorizontalAlignment="Right" />
+          <TextBlock Grid.Column="2" Text="{Binding RemainingPercent, StringFormat={}{0:0}% remaining}" FontSize="12" HorizontalAlignment="Right" Foreground="{DynamicResource ForegroundBrush}" />
          </Grid>
         </DataTemplate></ItemsControl.ItemTemplate>
        </ItemsControl>
@@ -78,7 +78,7 @@
     </DataTemplate></ListBox.ItemTemplate>
    </ListBox>
    <StackPanel x:Name="EmptyState" HorizontalAlignment="Center" VerticalAlignment="Center" MaxWidth="440">
-    <TextBlock Text="Your accounts, in one place" FontSize="22" FontWeight="SemiBold" TextAlignment="Center" />
+    <TextBlock Text="Your accounts, in one place" FontSize="22" FontWeight="SemiBold" TextAlignment="Center" Foreground="{DynamicResource ForegroundBrush}" />
     <TextBlock Text="Save your current Codex session, sign in to another account, or drop an auth.json or profile backup here."
       Foreground="{DynamicResource SecondaryBrush}" TextWrapping="Wrap" TextAlignment="Center" Margin="0,12,0,0" />
    </StackPanel>

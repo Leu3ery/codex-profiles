@@ -123,7 +123,7 @@ public sealed class CodexCli(string executable, ProfileStore store)
         try
         {
             await Send(new { id = 0, method = "initialize", @params = new {
-                clientInfo = new { name = "codex_profiles", title = "Codex Profiles", version = "2.0.2" },
+                clientInfo = new { name = "codex_profiles", title = "Codex Profiles", version = "2.0.3" },
                 capabilities = new { experimentalApi = experimental } } });
             await Receive(0);
             await Send(new { method = "initialized" });

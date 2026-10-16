@@ -78,6 +78,10 @@ internal static class SmokeTest
         var text = Descendants(window.SignInButton).OfType<TextBlock>().First(x => x.Text == "Add account");
         Assert(((SolidColorBrush)text.Foreground).Color == ((SolidColorBrush)window.SignInButton.Foreground).Color,
             "Primary button label must inherit its contrasting foreground in both themes");
+        var foreground = ((SolidColorBrush)Application.Current.FindResource("ForegroundBrush")).Color;
+        Assert(((SolidColorBrush)window.TitleLabel.Foreground).Color == foreground, "Header theme foreground");
+        var title = Descendants(window.ProfileList).OfType<TextBlock>().First(x => x.Text == "Work");
+        Assert(((SolidColorBrush)title.Foreground).Color == foreground, "Profile title theme foreground");
     }
     private static IEnumerable<DependencyObject> Descendants(DependencyObject parent)
     {

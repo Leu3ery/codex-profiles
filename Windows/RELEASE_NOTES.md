@@ -2,8 +2,8 @@ Native Windows port of Codex Profiles 2.0, based on [qwersyk/codex-profiles](htt
 
 ### Downloads
 
-- **Most Windows PCs:** `Codex-Profiles-2.0.2-windows-x64-Setup.exe`.
-- **Windows on ARM:** `Codex-Profiles-2.0.2-windows-arm64-Setup.exe`.
+- **Most Windows PCs:** `Codex-Profiles-2.0.3-windows-x64-Setup.exe`.
+- **Windows on ARM:** `Codex-Profiles-2.0.3-windows-arm64-Setup.exe`.
 - Portable EXEs and ZIPs are also attached. The .NET runtime is included; administrator privileges are not required.
 
 ### Features

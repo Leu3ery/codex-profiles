@@ -13,10 +13,17 @@ internal static class DialogLayout
         window.ResizeMode = ResizeMode.NoResize; window.WindowStartupLocation = WindowStartupLocation.CenterOwner;
         var body = new StackPanel { Margin = new Thickness(24) };
         window.Content = body;
-        body.Children.Add(new TextBlock { Text = title, FontSize = 22, FontWeight = FontWeights.SemiBold, Margin = new Thickness(0, 0, 0, 20) });
+        var heading = new TextBlock { Text = title, FontSize = 22, FontWeight = FontWeights.SemiBold, Margin = new Thickness(0, 0, 0, 20) };
+        heading.SetResourceReference(TextBlock.ForegroundProperty, "ForegroundBrush");
+        body.Children.Add(heading);
         return body;
     }
-    public static void Label(StackPanel body, string text) => body.Children.Add(new TextBlock { Text = text, Margin = new Thickness(0, 12, 0, 6), TextWrapping = TextWrapping.Wrap });
+    public static void Label(StackPanel body, string text)
+    {
+        var label = new TextBlock { Text = text, Margin = new Thickness(0, 12, 0, 6), TextWrapping = TextWrapping.Wrap };
+        label.SetResourceReference(TextBlock.ForegroundProperty, "ForegroundBrush");
+        body.Children.Add(label);
+    }
     public static ComboBox Picker(StackPanel body, string[] choices, string selected)
     {
         var picker = new ComboBox { ItemsSource = choices, SelectedItem = selected };

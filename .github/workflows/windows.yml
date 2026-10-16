@@ -45,7 +45,7 @@ jobs:
         shell: pwsh
         run: |
           $destination = Join-Path $env:RUNNER_TEMP 'Codex Profiles Installed'
-          $setup = Start-Process 'dist/windows-x64/Codex-Profiles-2.0.2-windows-x64-Setup.exe' -ArgumentList @('/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART', "/DIR=`"$destination`"") -Wait -PassThru
+          $setup = Start-Process 'dist/windows-x64/Codex-Profiles-2.0.3-windows-x64-Setup.exe' -ArgumentList @('/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART', "/DIR=`"$destination`"") -Wait -PassThru
           if ($setup.ExitCode -ne 0) { throw "Installer exited with $($setup.ExitCode)" }
           $output = Join-Path $env:RUNNER_TEMP 'codex-profiles-installed-smoke'
           $app = Start-Process "$destination/Codex-Profiles.exe" -ArgumentList @('--smoke-test', $output) -PassThru
@@ -88,4 +88,4 @@ jobs:
         run: |
           mapfile -t assets < <(find release-assets -type f \( -name '*.exe' -o -name '*.zip' -o -name 'SHA256SUMS-*.txt' \))
           test "${#assets[@]}" -eq 8
-          gh release create "$GITHUB_REF_NAME" "${assets[@]}" --verify-tag --title "Codex Profiles 2.0.2 for Windows" --notes-file Windows/RELEASE_NOTES.md
+          gh release create "$GITHUB_REF_NAME" "${assets[@]}" --verify-tag --title "Codex Profiles 2.0.3 for Windows" --notes-file Windows/RELEASE_NOTES.md

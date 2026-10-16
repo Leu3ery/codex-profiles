@@ -1,4 +1,4 @@
-param([ValidateSet('x64', 'arm64')][string]$Architecture = 'x64', [string]$Version = '2.0.2')
+param([ValidateSet('x64', 'arm64')][string]$Architecture = 'x64', [string]$Version = '2.0.3')
 $ErrorActionPreference = 'Stop'
 $root = Split-Path $PSScriptRoot -Parent
 $output = Join-Path $root "dist/windows-$Architecture"
