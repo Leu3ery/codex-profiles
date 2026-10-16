@@ -143,14 +143,18 @@ public partial class MainWindow : Window
     private void OpenLoginLink(object sender, RoutedEventArgs e) { if (loginUrl is not null) Process.Start(new ProcessStartInfo(loginUrl) { UseShellExecute = true }); }
     private void CancelWork(object sender, RoutedEventArgs e) => work?.Cancel();
 
-    internal async Task SwitchAsync(Guid id) => await RunAsync("Switching account…", async token =>
+    internal async Task SwitchAsync(Guid id)
     {
-        Store.ValidateFileStorage();
-        _ = Store.Auth(id);
-        var desktop = await DesktopRuntime.QuitAsync(token);
-        try { Store.Restore(id); }
-        finally { if (desktop is not null) DesktopRuntime.Launch(Settings.DesktopPath ?? desktop); }
-    });
+        await RunAsync("Switching account…", async token =>
+        {
+            Store.ValidateFileStorage();
+            _ = Store.Auth(id);
+            var desktop = await DesktopRuntime.QuitAsync(token);
+            try { Store.Restore(id); }
+            finally { if (desktop is not null) DesktopRuntime.Launch(Settings.DesktopPath ?? desktop); }
+        });
+        ProfileList.SelectedItem = rows.FirstOrDefault(x => x.Id == id);
+    }
     private async void SwitchSelected(object sender, RoutedEventArgs e) { if (Selected is { } row) await SwitchAsync(row.Id); }
     private async void SaveCurrent(object sender, RoutedEventArgs e) => await RunAsync("Saving current session…", _ => { Store.CaptureCurrent(); return Task.CompletedTask; });
     private async void SignOut(object sender, RoutedEventArgs e) => await RunAsync("Signing out locally…", async token =>

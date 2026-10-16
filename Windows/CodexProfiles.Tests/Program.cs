@@ -65,14 +65,14 @@ static async Task WithStore(Func<ProfileStore, string, Task> action)
 }
 
 Add("Archive round-trip and deduplication", (store, root) => {
-    store.Import(Auth("one")); var profile = store.Profiles.Single();
+    var original = Auth("one"); store.Import(original); var profile = store.Profiles.Single();
     store.Update(profile with { CustomName = "Personal", AvatarSymbol = "terminal", AvatarColorToken = "green" });
     var path = Path.Combine(root, "backup.json"); store.Export(path);
     var target = new ProfileStore(Path.Combine(root, "other"), Path.Combine(root, "other-home"));
     Assert(target.Import(File.ReadAllText(path)) == 1); Assert(target.Import(File.ReadAllText(path)) == 1);
     Assert(target.Profiles.Count == 1 && target.Profiles.Single().CustomName == "Personal");
     Assert(target.Profiles.Single().AvatarSymbol == "terminal");
-    Assert(target.Auth(target.Profiles.Single().Id).Json == Auth("one"));
+    Assert(target.Auth(target.Profiles.Single().Id).Json == original);
 });
 Add("macOS fractional ISO dates and strict archive versions", (store, _) => {
     var archive = new JsonObject { ["format"] = "codex-profiles-archive", ["version"] = 1, ["exportedAt"] = "2026-09-02T20:41:58Z",
