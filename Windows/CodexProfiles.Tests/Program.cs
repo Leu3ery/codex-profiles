@@ -26,6 +26,7 @@ if (args.FirstOrDefault() is "app-server" or "login")
         return;
     }
     var mode = Environment.GetEnvironmentVariable("CODEX_PROFILES_FAKE_MODE");
+    var observedRefresh = false;
     while (Console.ReadLine() is { } line)
     {
         var request = JsonNode.Parse(line)!;
@@ -39,13 +40,14 @@ if (args.FirstOrDefault() is "app-server" or "login")
         }
         if (method == "account/read")
         {
+            observedRefresh = true;
             if (mode == "permanent")
             { Console.WriteLine(JsonSerializer.Serialize(new { id, error = new { message = "refresh_token_reused" } })); continue; }
             if (mode != "unchanged" && mode != "swallowed") Storage.WriteText(Path.Combine(home, "auth.json"), Auth("renew", "rotated-refresh", 5));
             if (mode == "timeout") { await Task.Delay(10000); continue; }
             result = new { account = new { type = "chatgpt" } };
         }
-        if (method == "getAuthStatus") result = new { authMethod = "chatgpt", authToken = mode == "swallowed" ? null : "synthetic" };
+        if (method == "getAuthStatus") result = new { authMethod = "chatgpt", authToken = mode == "swallowed" && observedRefresh ? null : "synthetic" };
         if (method == "account/rateLimits/read") result = new { rateLimits = new { primary = new { usedPercent = 25, windowDurationMins = 300 } } };
         if (method == "account/login/start" && request["params"]?["type"]?.GetValue<string>() != "chatgptAuthTokens") throw new Exception("Usage login must use external access tokens");
         Console.WriteLine(JsonSerializer.Serialize(new { id, result }));

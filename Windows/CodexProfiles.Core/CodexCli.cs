@@ -86,8 +86,10 @@ public sealed class CodexCli(string executable, ProfileStore store)
     }
 
     private async Task<JsonObject> RequestAsync(string home, (string Method, object Params)[] requests,
-        bool experimental, CancellationToken cancellationToken)
+        bool experimental, CancellationToken cancellationToken, bool verifyRenewal = false)
     {
+        var queued = requests.ToList();
+        var previous = verifyRenewal ? new AuthDocument(File.ReadAllText(Path.Combine(home, "auth.json"))) : null;
         using var deadline = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         deadline.CancelAfter(TimeSpan.FromSeconds(35));
         using var process = Start(home, "app-server", "-c", "cli_auth_credentials_store=\"file\"", "--listen", "stdio://");
@@ -128,10 +130,23 @@ public sealed class CodexCli(string executable, ProfileStore store)
             await Receive(0);
             await Send(new { method = "initialized" });
             JsonObject result = [];
-            for (var i = 0; i < requests.Length; i++)
+            for (var i = 0; i < queued.Count; i++)
             {
-                await Send(new { id = i + 1, method = requests[i].Method, @params = requests[i].Params });
-                result = await Receive(i + 1);
+                await Send(new { id = i + 1, method = queued[i].Method, @params = queued[i].Params });
+                var response = await Receive(i + 1);
+                if (queued[i].Method == "getAuthStatus")
+                {
+                    if (AuthDocument.Text(response["authMethod"]) == "chatgpt" && response["authToken"] is null)
+                        throw new CodexRpcException(true);
+                }
+                else result = response;
+                if (previous is not null && i == 0)
+                {
+                    var latest = new AuthDocument(File.ReadAllText(Path.Combine(home, "auth.json")));
+                    // The legacy status endpoint observes refresh failures cached in this process.
+                    if (latest.AccessToken == previous.AccessToken && latest.RefreshToken == previous.RefreshToken)
+                        queued.Add(("getAuthStatus", new { includeToken = true, refreshToken = false }));
+                }
             }
             return result;
         }
@@ -169,13 +184,7 @@ public sealed class CodexCli(string executable, ProfileStore store)
         Exception? failure = null;
         try
         {
-            await RequestAsync(workspace.Path, [("account/read", new { refreshToken = true })], false, cancellationToken);
-            var latest = new AuthDocument(File.ReadAllText(path));
-            if (latest.AccessToken == previous.AccessToken && latest.RefreshToken == previous.RefreshToken)
-            {
-                var status = await RequestAsync(workspace.Path, [("getAuthStatus", new { includeToken = true, refreshToken = false })], false, cancellationToken);
-                if (AuthDocument.Text(status["authMethod"]) == "chatgpt" && status["authToken"] is null) throw new CodexRpcException(true);
-            }
+            await RequestAsync(workspace.Path, [("account/read", new { refreshToken = true })], false, cancellationToken, verifyRenewal: true);
         }
         catch (Exception e) { failure = e; }
         try { store.CompleteRenewal(id, new AuthDocument(File.ReadAllText(path)), previous); }
