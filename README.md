@@ -10,7 +10,13 @@
   <img alt="Codex Profiles in light mode" src="screenshots/codex-profiles-light.png">
 </picture>
 
-Native macOS manager for local ChatGPT / Codex profiles.
+Native macOS and Windows manager for local ChatGPT / Codex profiles.
+
+## Windows
+
+This fork adds a native Windows port of version 2.0. Download the installer or portable EXE from [Releases](https://github.com/Leu3ery/codex-profiles/releases/latest). Both x64 and ARM64 builds include the .NET runtime.
+
+See the [Windows guide](Windows/README.md) for installation, Codex CLI setup, encrypted storage, compatibility, and building from source. The original macOS app is preserved below.
 
 ## Features
 
@@ -18,7 +24,7 @@ Native macOS manager for local ChatGPT / Codex profiles.
 - Cached limits, reset counts, and manual or automatic session renewal
 - Optional menu bar, ⌘0–9 switching, email privacy, and custom avatars
 
-## Build
+## Build for macOS
 
 ```bash
 chmod +x Scripts/build_dmg.sh

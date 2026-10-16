@@ -1,0 +1,109 @@
+<Window x:Class="CodexProfiles.Windows.MainWindow"
+ xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ Title="Codex Profiles" Width="1040" Height="740" MinWidth="780" MinHeight="600"
+ WindowStartupLocation="CenterScreen" Icon="AppIcon.ico" AllowDrop="True" Drop="FilesDropped" PreviewKeyDown="ShortcutPressed">
+ <Grid Margin="28">
+  <Grid.RowDefinitions>
+   <RowDefinition Height="Auto" /><RowDefinition Height="Auto" /><RowDefinition Height="*" /><RowDefinition Height="Auto" /><RowDefinition Height="Auto" />
+  </Grid.RowDefinitions>
+  <Grid Margin="0,0,0,24">
+   <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+   <StackPanel>
+    <TextBlock Text="Codex Profiles" FontSize="28" FontWeight="SemiBold" />
+    <TextBlock x:Name="CurrentLabel" Margin="0,8,0,0" Foreground="{DynamicResource SecondaryBrush}" TextWrapping="Wrap" />
+   </StackPanel>
+   <Button Grid.Column="1" Content="Settings" Click="OpenSettings" VerticalAlignment="Top" Margin="16,0,0,0" />
+  </Grid>
+  <Grid x:Name="Toolbar" Grid.Row="1" Margin="0,0,0,16">
+   <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+   <WrapPanel>
+    <Button x:Name="SignInButton" Content="Add account" Style="{StaticResource PrimaryButton}" Click="SignIn" />
+    <Button x:Name="SaveCurrentButton" Content="Save current" Click="SaveCurrent" />
+    <Button Content="Import…" Click="ImportProfiles" />
+    <Button Content="Back up all…" Click="ExportAll" />
+   </WrapPanel>
+   <ComboBox Grid.Column="1" x:Name="SortPicker" Width="100" Margin="16,0,0,0" SelectionChanged="SortChanged" ToolTip="Sort profiles" AutomationProperties.Name="Sort profiles">
+    <ComboBoxItem Content="Recent" /><ComboBoxItem Content="Created" /><ComboBoxItem Content="Name" />
+   </ComboBox>
+  </Grid>
+  <Grid Grid.Row="2">
+   <ListBox x:Name="ProfileList" Background="Transparent" BorderThickness="0" HorizontalContentAlignment="Stretch"
+    ScrollViewer.HorizontalScrollBarVisibility="Disabled" SelectionChanged="ProfileSelected" AutomationProperties.Name="Saved profiles">
+    <ListBox.ItemContainerStyle><Style TargetType="ListBoxItem">
+     <Setter Property="Padding" Value="0" /><Setter Property="Margin" Value="0,0,0,8" />
+     <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+     <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="ListBoxItem">
+      <Border x:Name="Card" BorderBrush="{DynamicResource BorderBrush}" Background="{DynamicResource SurfaceBrush}"
+        BorderThickness="1" CornerRadius="8" Padding="16">
+       <ContentPresenter />
+      </Border>
+      <ControlTemplate.Triggers>
+       <Trigger Property="IsSelected" Value="True"><Setter TargetName="Card" Property="BorderBrush" Value="{DynamicResource AccentBrush}" /><Setter TargetName="Card" Property="BorderThickness" Value="2" /></Trigger>
+       <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Card" Property="Opacity" Value="0.88" /></Trigger>
+       <Trigger Property="IsEnabled" Value="False"><Setter TargetName="Card" Property="Opacity" Value="0.5" /></Trigger>
+      </ControlTemplate.Triggers>
+     </ControlTemplate></Setter.Value></Setter>
+    </Style></ListBox.ItemContainerStyle>
+    <ListBox.ItemTemplate><DataTemplate>
+     <Grid>
+      <Grid.ColumnDefinitions><ColumnDefinition Width="52" /><ColumnDefinition Width="*" /><ColumnDefinition Width="130" /></Grid.ColumnDefinitions>
+      <Border Width="40" Height="40" CornerRadius="20" Background="{Binding AvatarBrush}" HorizontalAlignment="Left" VerticalAlignment="Top">
+       <TextBlock Text="{Binding Avatar}" FontFamily="Segoe UI Symbol" FontSize="20" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" />
+      </Border>
+      <StackPanel Grid.Column="1">
+       <TextBlock Text="{Binding Title}" FontSize="16" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+       <TextBlock Text="{Binding Subtitle}" Margin="0,4,0,0" Foreground="{DynamicResource SecondaryBrush}" TextTrimming="CharacterEllipsis" />
+       <TextBlock Text="{Binding Warning}" Margin="0,4,0,0" FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource SecondaryBrush}" />
+       <ItemsControl ItemsSource="{Binding Windows}" Margin="0,4,12,0">
+        <ItemsControl.ItemTemplate><DataTemplate>
+         <Grid Margin="0,6,0,0">
+          <Grid.ColumnDefinitions><ColumnDefinition Width="76" /><ColumnDefinition Width="*" /><ColumnDefinition Width="150" /></Grid.ColumnDefinitions>
+          <TextBlock Text="{Binding DurationLabel}" FontSize="12" />
+          <StackPanel Grid.Column="1">
+           <ProgressBar Value="{Binding RemainingPercent}" Maximum="100" Height="5" Foreground="{DynamicResource AccentBrush}" Background="{DynamicResource BorderBrush}" BorderThickness="0" />
+           <TextBlock Text="{Binding ResetLabel}" Margin="0,4,0,0" FontSize="11" Foreground="{DynamicResource SecondaryBrush}" />
+          </StackPanel>
+          <TextBlock Grid.Column="2" Text="{Binding RemainingPercent, StringFormat={}{0:0}% remaining}" FontSize="12" HorizontalAlignment="Right" />
+         </Grid>
+        </DataTemplate></ItemsControl.ItemTemplate>
+       </ItemsControl>
+       <TextBlock Text="{Binding CacheLabel}" FontSize="11" Margin="0,4,0,0" Foreground="{DynamicResource SecondaryBrush}" />
+      </StackPanel>
+      <StackPanel Grid.Column="2" HorizontalAlignment="Right">
+       <TextBlock Text="{Binding State}" FontWeight="SemiBold" Foreground="{DynamicResource AccentBrush}" HorizontalAlignment="Right" />
+       <TextBlock Text="{Binding Shortcut}" Margin="0,8,0,0" FontSize="12" Foreground="{DynamicResource SecondaryBrush}" HorizontalAlignment="Right" />
+      </StackPanel>
+     </Grid>
+    </DataTemplate></ListBox.ItemTemplate>
+   </ListBox>
+   <StackPanel x:Name="EmptyState" HorizontalAlignment="Center" VerticalAlignment="Center" MaxWidth="440">
+    <TextBlock Text="Your accounts, in one place" FontSize="22" FontWeight="SemiBold" TextAlignment="Center" />
+    <TextBlock Text="Save your current Codex session, sign in to another account, or drop an auth.json or profile backup here."
+      Foreground="{DynamicResource SecondaryBrush}" TextWrapping="Wrap" TextAlignment="Center" Margin="0,12,0,0" />
+   </StackPanel>
+  </Grid>
+  <WrapPanel Grid.Row="3" x:Name="ProfileActions" Margin="0,16,0,0">
+   <Button x:Name="SwitchButton" Content="Switch account" Style="{StaticResource PrimaryButton}" Click="SwitchSelected" />
+   <Button Content="Check limits" Click="CheckLimits" />
+   <Button Content="Renew session" Click="RenewSelected" />
+   <Button Content="Edit…" Click="EditSelected" />
+   <Button Content="Export…" Click="ExportSelected" />
+   <Button Content="Remove" Click="DeleteSelected" />
+  </WrapPanel>
+  <Grid Grid.Row="4" Margin="0,20,0,0">
+   <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+   <StackPanel>
+    <TextBlock x:Name="StatusLabel" Text="Ready · Profiles stay on this PC" Foreground="{DynamicResource SecondaryBrush}" TextWrapping="Wrap" AutomationProperties.LiveSetting="Polite" />
+    <ProgressBar x:Name="BusyIndicator" IsIndeterminate="True" Height="3" Visibility="Collapsed" Margin="0,8,16,0" />
+    <TextBlock x:Name="LoginLink" Visibility="Collapsed" Margin="0,8,0,0">
+     <Hyperlink Click="OpenLoginLink">Open sign-in link in browser</Hyperlink>
+    </TextBlock>
+   </StackPanel>
+   <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Top" Margin="16,0,0,0">
+    <Button x:Name="CancelButton" Content="Cancel" Visibility="Collapsed" Click="CancelWork" />
+    <Button Content="Sign out locally" Click="SignOut" Margin="0" />
+   </StackPanel>
+  </Grid>
+ </Grid>
+</Window>

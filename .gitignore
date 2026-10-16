@@ -4,3 +4,6 @@ Assets/AppIcon.iconset
 Assets/CodexProfiles.icns
 .DS_Store
 .idea
+**/bin/
+**/obj/
+Windows/TestResults/
