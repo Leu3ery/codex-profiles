@@ -41,7 +41,17 @@ public static class Storage
         {
             using (var stream = new FileStream(temporary, FileMode.CreateNew, FileAccess.Write, FileShare.None))
             {
-                if (!OperatingSystem.IsWindows()) File.SetUnixFileMode(temporary, UnixFileMode.UserRead | UnixFileMode.UserWrite);
+                if (OperatingSystem.IsWindows())
+                {
+                    var security = new FileSecurity();
+                    security.SetAccessRuleProtection(true, false);
+                    var user = WindowsIdentity.GetCurrent().User ?? throw new IOException("Cannot identify the current Windows user.");
+                    security.SetOwner(user);
+                    security.AddAccessRule(new FileSystemAccessRule(user, FileSystemRights.FullControl, AccessControlType.Allow));
+                    security.AddAccessRule(new FileSystemAccessRule(new SecurityIdentifier(WellKnownSidType.LocalSystemSid, null), FileSystemRights.FullControl, AccessControlType.Allow));
+                    new FileInfo(temporary).SetAccessControl(security);
+                }
+                else File.SetUnixFileMode(temporary, UnixFileMode.UserRead | UnixFileMode.UserWrite);
                 stream.Write(data);
                 stream.Flush(true);
             }
