@@ -39,19 +39,8 @@ public static class Storage
         var temporary = Path.Combine(directory, ".codex-profiles-" + Guid.NewGuid() + ".tmp");
         try
         {
-            using (var stream = new FileStream(temporary, FileMode.CreateNew, FileAccess.Write, FileShare.None))
+            using (var stream = CreatePrivateFile(temporary))
             {
-                if (OperatingSystem.IsWindows())
-                {
-                    var security = new FileSecurity();
-                    security.SetAccessRuleProtection(true, false);
-                    var user = WindowsIdentity.GetCurrent().User ?? throw new IOException("Cannot identify the current Windows user.");
-                    security.SetOwner(user);
-                    security.AddAccessRule(new FileSystemAccessRule(user, FileSystemRights.FullControl, AccessControlType.Allow));
-                    security.AddAccessRule(new FileSystemAccessRule(new SecurityIdentifier(WellKnownSidType.LocalSystemSid, null), FileSystemRights.FullControl, AccessControlType.Allow));
-                    new FileInfo(temporary).SetAccessControl(security);
-                }
-                else File.SetUnixFileMode(temporary, UnixFileMode.UserRead | UnixFileMode.UserWrite);
                 stream.Write(data);
                 stream.Flush(true);
             }
@@ -60,6 +49,22 @@ public static class Storage
             File.Move(temporary, path, true);
         }
         finally { if (File.Exists(temporary)) File.Delete(temporary); }
+    }
+
+    private static FileStream CreatePrivateFile(string path)
+    {
+        if (OperatingSystem.IsWindows())
+        {
+            var security = new FileSecurity();
+            security.SetAccessRuleProtection(true, false);
+            var user = WindowsIdentity.GetCurrent().User ?? throw new IOException("Cannot identify the current Windows user.");
+            security.SetOwner(user);
+            security.AddAccessRule(new FileSystemAccessRule(user, FileSystemRights.FullControl, AccessControlType.Allow));
+            security.AddAccessRule(new FileSystemAccessRule(new SecurityIdentifier(WellKnownSidType.LocalSystemSid, null), FileSystemRights.FullControl, AccessControlType.Allow));
+            return new FileInfo(path).Create(FileMode.CreateNew, FileSystemRights.FullControl, FileShare.None, 4096, FileOptions.None, security);
+        }
+        return new FileStream(path, new FileStreamOptions { Mode = FileMode.CreateNew, Access = FileAccess.Write, Share = FileShare.None,
+            UnixCreateMode = UnixFileMode.UserRead | UnixFileMode.UserWrite });
     }
 
     public static void WriteText(string path, string value) => AtomicWrite(path, Encoding.UTF8.GetBytes(value));

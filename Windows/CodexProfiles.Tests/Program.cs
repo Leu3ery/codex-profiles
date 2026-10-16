@@ -1,6 +1,8 @@
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using System.Security.AccessControl;
+using System.Security.Principal;
 using CodexProfiles.Core;
 
 static string Jwt(string account, string email = "alex@example.test", int days = 7, int issued = 0) => "test." +
@@ -133,6 +135,17 @@ Add("Vault survives restart and refuses corrupt data", (store, _) => {
     if (OperatingSystem.IsWindows()) Assert(!Encoding.UTF8.GetString(File.ReadAllBytes(path)).Contains("refresh-one"), "DPAPI encryption missing");
     Storage.WriteText(path, "corrupt"); Throws(() => new ProfileStore(store.Root, store.CodexHome));
     Assert(File.ReadAllText(path) == "corrupt");
+});
+Add("Secret files restrict permissions at creation", (store, root) => {
+    store.Import(Auth("one")); var path = Path.Combine(root, "export.json"); store.Export(path);
+    if (OperatingSystem.IsWindows()) {
+        var security = new FileInfo(path).GetAccessControl();
+        Assert(security.AreAccessRulesProtected);
+        var allowed = security.GetAccessRules(true, true, typeof(SecurityIdentifier)).Cast<FileSystemAccessRule>();
+        var user = WindowsIdentity.GetCurrent().User!;
+        var system = new SecurityIdentifier(WellKnownSidType.LocalSystemSid, null);
+        foreach (var rule in allowed) Assert(rule.IdentityReference == user || rule.IdentityReference == system);
+    } else Assert(File.GetUnixFileMode(path) == (UnixFileMode.UserRead | UnixFileMode.UserWrite));
 });
 Add("Shared and active refresh tokens cannot be renewed", (store, _) => {
     store.Import(Auth("one", "shared")); store.Import(Auth("two", "shared"));
