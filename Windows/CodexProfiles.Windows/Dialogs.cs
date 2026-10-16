@@ -9,6 +9,7 @@ internal static class DialogLayout
 {
     public static StackPanel Body(Window window, string title, double width)
     {
+        window.Style = (Style)Application.Current.FindResource(typeof(Window));
         window.Title = title; window.Width = width; window.SizeToContent = SizeToContent.Height;
         window.ResizeMode = ResizeMode.NoResize; window.WindowStartupLocation = WindowStartupLocation.CenterOwner;
         var body = new StackPanel { Margin = new Thickness(24) };

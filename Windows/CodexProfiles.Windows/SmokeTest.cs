@@ -75,6 +75,9 @@ internal static class SmokeTest
     private static void AssertButtonText(MainWindow window)
     {
         window.UpdateLayout();
+        Assert(window.FontSize == 14, "Window must use the application typography");
+        Assert(((SolidColorBrush)window.Background).Color == ((SolidColorBrush)Application.Current.FindResource("CanvasBrush")).Color,
+            "Window background must follow the selected theme");
         var text = Descendants(window.SignInButton).OfType<TextBlock>().First(x => x.Text == "Add account");
         Assert(((SolidColorBrush)text.Foreground).Color == ((SolidColorBrush)window.SignInButton.Foreground).Color,
             "Primary button label must inherit its contrasting foreground in both themes");
