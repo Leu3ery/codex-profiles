@@ -15,7 +15,6 @@
    <Setter Property="FontFamily" Value="Segoe UI" />
    <Setter Property="FontSize" Value="14" />
   </Style>
-  <Style TargetType="TextBlock"><Setter Property="Foreground" Value="{DynamicResource ForegroundBrush}" /></Style>
   <Style TargetType="Control"><Setter Property="Foreground" Value="{DynamicResource ForegroundBrush}" /></Style>
   <Style TargetType="Button">
    <Setter Property="Foreground" Value="{DynamicResource ForegroundBrush}" />

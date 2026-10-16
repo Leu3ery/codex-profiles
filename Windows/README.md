@@ -6,8 +6,8 @@ A native WPF port of the macOS Codex Profiles 2.0 profile manager. The original 
 
 Download the installer from [this fork's releases](https://github.com/Leu3ery/codex-profiles/releases/latest):
 
-- Most PCs: `Codex-Profiles-2.0.1-windows-x64-Setup.exe`.
-- Windows on ARM: `Codex-Profiles-2.0.1-windows-arm64-Setup.exe`.
+- Most PCs: `Codex-Profiles-2.0.2-windows-x64-Setup.exe`.
+- Windows on ARM: `Codex-Profiles-2.0.2-windows-arm64-Setup.exe`.
 - A portable `.exe` and ZIP are also available for each architecture.
 
 Run the installer, then open **Codex Profiles** from the Start menu. Installation is per-user and does not require administrator privileges. The app includes its .NET 10 runtime. Windows 11 is recommended. The executables are not Authenticode-signed, so Windows may show a publisher/reputation prompt. SHA-256 checksums are provided with the release.

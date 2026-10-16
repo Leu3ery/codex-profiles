@@ -54,8 +54,10 @@ internal static class SmokeTest
             window.SetSettings(window.Settings with { HideEmails = true, Theme = "Light" });
             Assert(!window.CurrentLabel.Text.Contains('@'), "Email privacy in header");
             Assert(window.ProfileList.Items.Cast<ProfileRow>().All(x => !x.Title.Contains('@') && !x.Subtitle.Contains('@')), "Email privacy in rows");
+            AssertButtonText(window);
             Capture(window, Path.Combine(output, "light.png"));
             window.SetSettings(window.Settings with { Theme = "Dark" });
+            AssertButtonText(window);
             Capture(window, Path.Combine(output, "dark.png"));
             window.Width = 780; window.Height = 600;
             Capture(window, Path.Combine(output, "compact.png"));
@@ -70,13 +72,32 @@ internal static class SmokeTest
     }
 
     private static void Assert(bool condition, string label) { if (!condition) throw new InvalidOperationException(label); }
+    private static void AssertButtonText(MainWindow window)
+    {
+        window.UpdateLayout();
+        var text = Descendants(window.SignInButton).OfType<TextBlock>().First(x => x.Text == "Add account");
+        Assert(((SolidColorBrush)text.Foreground).Color == ((SolidColorBrush)window.SignInButton.Foreground).Color,
+            "Primary button label must inherit its contrasting foreground in both themes");
+    }
+    private static IEnumerable<DependencyObject> Descendants(DependencyObject parent)
+    {
+        for (var i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
+        {
+            var child = VisualTreeHelper.GetChild(parent, i);
+            yield return child;
+            foreach (var nested in Descendants(child)) yield return nested;
+        }
+    }
     private static void Capture(Window window, string path)
     {
         window.UpdateLayout();
         var content = (FrameworkElement)window.Content;
         content.UpdateLayout();
         var bitmap = new RenderTargetBitmap((int)Math.Ceiling(content.ActualWidth), (int)Math.Ceiling(content.ActualHeight), 96, 96, PixelFormats.Pbgra32);
-        bitmap.Render(content);
+        var visual = new DrawingVisual();
+        using (var drawing = visual.RenderOpen())
+            drawing.DrawRectangle(new VisualBrush(content), null, new Rect(0, 0, content.ActualWidth, content.ActualHeight));
+        bitmap.Render(visual);
         var encoder = new PngBitmapEncoder(); encoder.Frames.Add(BitmapFrame.Create(bitmap));
         using var file = File.Create(path); encoder.Save(file);
     }
